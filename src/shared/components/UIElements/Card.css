@@ -1,0 +1,25 @@
+.card {
+  position: relative;
+  margin: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+  border-radius: 20px;
+  padding: 1rem;
+  overflow: hidden;
+  background-color: white;
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  -ms-border-radius: 20px;
+  -o-border-radius: 20px;
+  transition: transform 0.5s !important;
+  -webkit-transition: transform 0.5s !important;
+  -moz-transition: transform 0.5s !important;
+  -ms-transition: transform 0.5s !important;
+  -o-transition: transform 0.5s !important;
+}
+.card:hover {
+  transform: scale(1.1) !important;
+  -webkit-transform: scale(1.1) !important;
+  -moz-transform: scale(1.1) !important;
+  -ms-transform: scale(1.1) !important;
+  -o-transform: scale(1.1) !important;
+}
