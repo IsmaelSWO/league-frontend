@@ -1,0 +1,19 @@
+.avatar {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.avatar img {
+  display: block;
+  /* border-radius: 0%; */
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* -webkit-border-radius: ;
+  -moz-border-radius: ;
+  -ms-border-radius: ;
+  -o-border-radius: ; */
+}
