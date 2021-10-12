@@ -740,31 +740,82 @@ const PlayerItem = (props) => {
       <li className="place-item">
         <Card
           className={
-            props.team === "FC Barcelona"
-              ? "barcelona-item__content"
-              : props.team === "Elche CF"
-              ? "elche-item__content"
+            /* props.team === "Sevilla FC"
+              ? "sevilla-item__content"
+              : props.team === "Manchester United"
+              ? "manutd-item__content"
               : props.team === "AC Milan"
               ? "milan-item__content"
               : props.team === "Real Madrid"
               ? "madrid-item__content"
-              : props.team === "Deportivo Cali"
-              ? "cali-item__content"
-              : props.team === "Córdoba CF"
-              ? "cordoba-item__content"
+              : props.team === "Liverpool"
+              ? "liverpool-item__content"
+              : props.team === "Real Sociedad"
+              ? "realsoc-item__content"
               : props.team === "PSG"
               ? "psg-item__content"
-              : props.team === "UD Almería"
-              ? "almeria-item__content"
-              : props.team === "Sin equipo"
+              : props.team === "Valencia"
+              ? "valencia-item__content"
+              :  */props.team === "Sin equipo"
               ? "freeagent-item__content"
-              : props.team === "AD Alcorcón"
-              ? "alcorcon-item__content"
+              /* : props.team === "Atlético de Madrid"
+              ? "atletico-item__content"
+              : props.team === "RB Leipzig"
+              ? "leipzig-item__content"
+              : props.team === "Arsenal"
+              ? "arsenal-item__content"
+              : props.team === "FC Porto"
+              ? "porto-item__content"
+              : props.team === "Cheslea"
+              ? "chelsea-item__content"
+              : props.team === "Inter"
+              ? "inter-item__content"
+              : props.team === "Manchester City"
+              ? "mancity-item__content"
+              : props.team === "Athletic Club"
+              ? "athletic-item__content"
+              : props.team === "Atlético de Madrid"
+              ? "atletico-item__content"
+              : props.team === "Tottenham Hotspur"
+              ? "spur-item__content"
+              : props.team === "Bayern München"
+              ? "bayern-item__content"
+              : props.team === "SL Benfica"
+              ? "benfica-item__content"
+              : props.team === "Borussia Dortmund"
+              ? "bvb-item__content"
+              : props.team === "Real Betis"
+              ? "betis-item__content"
+              : props.team === "Ajax"
+              ? "ajax-item__content"
+              : props.team === "Villarreal"
+              ? "villarreal-item__content"
+              : props.team === "Olympique Lyonnais"
+              ? "lyon-item__content" */
               : "newManager-item__content"
           }
         >
           {isLoading && <LoadingSpinner asOverlay></LoadingSpinner>}
-          <div className="place-item__image">
+          <div className={props.address === "POR"
+                  ? "place-item__image POR-background"
+                  : props.address === "MC" ||
+                    props.address === "MCO" ||
+                    props.address === "MCD" ||
+                    props.address === "MD" ||
+                    props.address === "MI"
+                  ? "place-item__image MC-background"
+                  : props.address === "DC" ||
+                    props.address === "ED" ||
+                    props.address === "SD" ||
+                    props.address === "EI"
+                  ? "place-item__image DC-background"
+                  : props.address === "DFC" ||
+                    props.address === "LD" ||
+                    props.address === "LI" ||
+                    props.address === "CAR" ||
+                    props.address === "CAI"
+                  ? "place-item__image DFC-background"
+                  : ""}>
             <img src={`https://images.weserv.nl/?url=${props.image}`} alt={props.title} referrerPolicy="no-referrer"></img>
             <h3>{props.title}</h3>
             <div
