@@ -13,7 +13,7 @@ const PlayerList = (props) => {
   const total = props.items.length;
   let posts = props.items;
 
-  if (props.searchField && props.searchFreeAgent && props.searchMaxClause && props.searchMinClause && props.searchPosition) {
+  if (props.searchField && props.searchFreeAgent && props.searchMaxClause && props.searchMinClause && props.searchPosition && props.searchTransferible) {
     posts = props.items.filter((player) => {
     return (
       player.title
@@ -24,7 +24,11 @@ const PlayerList = (props) => {
         .includes(props.searchPosition.toLowerCase()) &&
       player.clausula >= props.searchMinClause &&
       player.clausula <= props.searchMaxClause &&
-      player.creatorName.includes(props.searchFreeAgent)
+      player.creatorName.includes(props.searchFreeAgent) &&
+      player.transferible.toString().includes(props.searchTransferible) 
+      //`${props.searchClausulable === "Si" ? player.Expires <= props.ahora : props.searchClausulable === "No" ? player.Expires <= props.ahora : player.Expires <= props.ahora || player.Expires > props.ahora}`
+        /* .toLowerCase()
+        .includes(props.searchTransferible.toLowerCase()) */
     );
   });
 }

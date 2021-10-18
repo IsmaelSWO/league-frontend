@@ -9,14 +9,17 @@ import SearchBox from "../components/SearchBox";
 
 
 const SearchPlayer = () => {
+  //const ahora = Date.now();
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const [loadedPlayers, setLoadedPlayers] = useState();
   const [update, setUpdate] = useState(false);
   const auth = useContext(AuthContext);
   const [searchField, setSearchField] = useState("");
   const [searchPosition, setSearchPosition] = useState("");
+  const [searchTransferible, setSearchTransferible] = useState("");
   const [searchMaxClause, setSearchMaxClause] = useState("999999999999");
   const [searchMinClause, setSearchMinClause] = useState("0");
+  //const [searchClausulable, setSearchClausulable] = useState("");
   const [searchFreeAgent, setSearchFreeAgent] = useState("");
   
   useEffect(() => {
@@ -27,14 +30,6 @@ const SearchPlayer = () => {
         );
 
         setLoadedPlayers(responseData.players);
-        /* const userHasOffers = await sendRequest(
-          `${process.env.REACT_APP_BACKEND_URL}/ofertas/get/receivedOffers/${auth.userId}`
-        );
-
-        var existing = localStorage.getItem("userData");
-        existing = JSON.parse(existing);
-        existing.hasOffers = userHasOffers;
-        localStorage.setItem("userData", JSON.stringify(existing)); */
       } catch (err) {}
     };
     fetchUsers();
@@ -51,18 +46,19 @@ const SearchPlayer = () => {
     setUpdate(!update);
   };
 
-  /*  const pageCount = Math.ceil(users.length / usersPerPage);
-
-  const changePage = ({ selected }) => {
-    setPageNumber(selected);
-  }; */
-
   const onSearchChange = (event) => {
     setSearchField(event.target.value);
   };
 
   const onSearchPosition = (event) => {
     setSearchPosition(event.target.value);
+  };
+  /* const onSearchClausulable = (event) => {
+    setSearchClausulable(event.target.value);
+  }; */
+
+  const onSearchTransferible = (event) => {
+    setSearchTransferible(event.target.value);
   };
 
   const onSearchMaxClause = (event) => {
@@ -103,10 +99,22 @@ const SearchPlayer = () => {
             searchPosition={onSearchPosition}
             searchMaxClause={onSearchMaxClause}
             searchMinClause={onSearchMinClause}
+            searchTransferible={onSearchTransferible}
             searchFreeAgent={onSearchFreeAgent}
+            //searchClausulable={onSearchClausulable}
           />
           <PlayerList
             items={loadedPlayers.filter((player) => {
+              /* let condition;
+              if (searchClausulable === "Si") {
+                condition = player.Expires <= ahora;
+              }
+              if (searchClausulable === "No") {
+                condition = player.Expires > ahora;
+              }
+              if (searchClausulable === "") {
+                condition = player.Expires <= ahora || player.Expires > ahora;
+              } */
               return (
                 player.title
                   .toLowerCase()
@@ -116,7 +124,11 @@ const SearchPlayer = () => {
                   .includes(searchPosition.toLowerCase()) &&
                 player.clausula >= searchMinClause &&
                 player.clausula <= searchMaxClause &&
-                player.creatorName.includes(searchFreeAgent)
+                player.creatorName.includes(searchFreeAgent) &&
+                player.transferible.toString().includes(searchTransferible) 
+                //`${searchClausulable === "Si" ? player.Expires <= ahora : searchClausulable === "No" ? player.Expires <= ahora : player.Expires <= ahora || player.Expires > ahora}`
+                  /* .toLowerCase()
+                  .includes(searchTransferible.toLowerCase()) */
               );
             })}
             searchField={searchField}
@@ -124,6 +136,9 @@ const SearchPlayer = () => {
             searchMinClause={searchMinClause}
             searchMaxClause={searchMaxClause}
             searchFreeAgent={searchFreeAgent}
+            searchTransferible={searchTransferible}
+            //searchClausulable={searchClausulable}
+            //ahora={ahora}
             onUpdate={updateHandler}
             onDeletePlayer={playerDeletedHandler}
           />

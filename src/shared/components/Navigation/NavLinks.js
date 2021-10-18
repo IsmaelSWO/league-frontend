@@ -31,13 +31,13 @@ const NavLinks = () => {
             </NavLink>
           </li>
         )}
-        {auth.isLoggedIn && (
+        {/* {auth.isLoggedIn && (
           <li>
             <NavLink to="/players/mercado" exact>
               Mercado
             </NavLink>
           </li>
-        )}
+        )} */}
         <li>
           <NavLink to="/buscador" exact>
             Buscador
@@ -68,6 +68,11 @@ const NavLinks = () => {
             Equipos
           </NavLink>
         </li>
+        {auth.isLoggedIn && (
+          <li>
+            <NavLink to={`/get/mismovimientos`}>Mis movimientos</NavLink>
+          </li>
+        )}
         {auth.isLoggedIn && (
           <li>
             <NavLink to={`/${auth.userId}/players`}>Mis jugadores</NavLink>

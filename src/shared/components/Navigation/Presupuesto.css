@@ -2,11 +2,17 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap");
 
 .Presupuesto {
-  color: rgb(0, 0, 0);
-  background-color: rgb(255, 255, 255);
-  font-family: "Roboto", sans-serif !important;
+  color: rgb(255, 255, 255);
+  background-image: url("https://i.imgur.com/KvN3f6c.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  margin-top: -66px !important;
+  /* background-color: #525252; */
+  /* font-family: "Roboto", sans-serif !important; */
+  /* font-weight: bolder !important; */
   border-radius: 10px !important;
-  width: 7rem !important;
+  width: 5rem !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -14,12 +20,22 @@
   padding: 1rem !important;
   z-index: 1 !important;
   position: fixed !important;
-  border-radius: 0px 10px 10px 0px !important;
-  -webkit-border-radius: 0px 10px 10px 0px !important;
-  -moz-border-radius: 0px 10px 10px 0px !important;
-  -ms-border-radius: 0px 10px 10px 0px !important;
-  -o-border-radius: 0px 10px 10px 0px !important;
+  border-bottom: 4px solid #494949;
+  /* border-top: 4px solid #494949; */
+  border-right: 4px solid #494949;
+  border-radius: 0px 0px 10px 0px !important;
+  -webkit-border-radius: 0px 0px 10px 0px !important;
+  -moz-border-radius: 0px 0px 10px 0px !important;
+  -ms-border-radius: 0px 0px 10px 0px !important;
+  -o-border-radius: 0px 0px 10px 0px !important;
 }
+
+/* .Presupuesto h4 {
+  font-family: Roboto,cursive!important;
+  margin-top: .9rem!important;
+  color: #fff!important;
+  font-weight: 700!important;
+} */
 
 .bucket-icon {
   margin-left: 0.4rem !important;

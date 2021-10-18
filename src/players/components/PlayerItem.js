@@ -19,9 +19,16 @@ import {
 
 const PlayerItem = (props) => {
   const clausulaAntigua = Number(props.clausula);
-  const inputRef =useRef();
+  const date = new Date();
+  const month = date.getMonth();
+  const year = date.getFullYear();
+  const initDateSummerTransfer = new Date(year, month, 15, 22, 30);
+  const nextMonthinitDateSummerTransfer = new Date(year, month+1, 15, 22, 30);
+  const endDateSummerTransfer = new Date(year, month, 18, 22, 30);
+  const initDateWinterTransfer = new Date(year, month+1, 1, 22, 30);
+  const endDateWinterTransfer = new Date(year, month, 4, 22, 30); 
   const [quantity, setQuantity] = useState(0);
-  const addingMiliseconds = 1324;
+  const addingMiliseconds = 604800000;
   const ahora = Date.now();
   const playerId = props.id;
   const [formState, inputHandler] = useForm(
@@ -137,17 +144,24 @@ const PlayerItem = (props) => {
   const confirmFreeBuyHandler = async () => {
     setShowFreeBuyModal(false);
     try {
-      await sendRequest(
+      const now = Date.now();
+      const Expires = now + addingMiliseconds;
+      const date = new Date();
+      const day = date.getDate();
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear();
+      const hour = date.getHours();
+      const minutes = date.getMinutes();
+      const seconds = date.getSeconds();
+      await Promise.all([sendRequest(
         `${process.env.REACT_APP_BACKEND_URL}/players/delete/${props.id}/${auth.userId}`,
         "DELETE",
         null,
         {
           Authorization: "Bearer " + auth.token,
         }
-      );
-      const now = Date.now();
-      const Expires = now + addingMiliseconds;
-      await sendRequest(
+      ),
+      sendRequest(
         `${process.env.REACT_APP_BACKEND_URL}/players/${props.id}`,
         "POST",
         JSON.stringify({
@@ -166,16 +180,8 @@ const PlayerItem = (props) => {
           "Content-Type": "application/json",
           Authorization: "Bearer " + auth.token,
         }
-      );
-      const date = new Date();
-      const day = date.getDate();
-      const month = date.getMonth() + 1;
-      const year = date.getFullYear();
-      const hour = date.getHours();
-      const minutes = date.getMinutes();
-      const seconds = date.getSeconds();
-
-      await sendRequest(
+      ),
+      sendRequest(
         process.env.REACT_APP_BACKEND_URL + "/messages/post",
         "POST",
         JSON.stringify({
@@ -191,7 +197,11 @@ const PlayerItem = (props) => {
           "Content-Type": "application/json",
           Authorization: "Bearer " + auth.token,
         }
-      );
+      )]);/* then(values => {
+        console.log(values);
+      }).catch(reason => {
+        console.log(reason)
+      }); */
       props.onDelete(props.id);
       props.onUpdate();
     } catch (err) {}
@@ -200,6 +210,25 @@ const PlayerItem = (props) => {
   const confirmDeleteHandler = async () => {
     setShowConfirmModal(false);
     try {
+      const responsePresupuestoUser = await sendRequest(
+        process.env.REACT_APP_BACKEND_URL + "/users"
+      );
+      const PresupuestoUser = responsePresupuestoUser.users
+        .filter((user) => user.id === auth.userId)
+        .map((user) => user.presupuesto);
+
+      const discardWin = Number(props.clausula) * 0.30;
+      const now = Date.now();
+      const weekMiliseconds = 604800000;
+      const Expires = now + addingMiliseconds;
+      const discardExpiresDate = now + weekMiliseconds;
+      const date = new Date();
+      const day = date.getDate();
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear();
+      const hour = date.getHours();
+      const minutes = date.getMinutes();
+      const seconds = date.getSeconds();
       await sendRequest(
         `${process.env.REACT_APP_BACKEND_URL}/players/${props.id}`,
         "DELETE",
@@ -208,10 +237,17 @@ const PlayerItem = (props) => {
           Authorization: "Bearer " + auth.token,
         }
       );
-      const now = Date.now();
-      const weekMiliseconds = /* 604800000 */ 343;
-      const Expires = now + addingMiliseconds;
-      const discardExpiresDate = now + weekMiliseconds;
+		  await sendRequest(
+        `${process.env.REACT_APP_BACKEND_URL}/users/pagarclausula/${auth.userId}`,
+        "PATCH",
+        JSON.stringify({
+          presupuesto: Number(PresupuestoUser) + Math.round(Number(discardWin)),
+        }),
+        {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + auth.token,
+        }
+      );
       await sendRequest(
         `${process.env.REACT_APP_BACKEND_URL}/players/discarded/${auth.userId}`,
         "POST",
@@ -233,14 +269,6 @@ const PlayerItem = (props) => {
           Authorization: "Bearer " + auth.token,
         }
       );
-      const date = new Date();
-      const day = date.getDate();
-      const month = date.getMonth() + 1;
-      const year = date.getFullYear();
-      const hour = date.getHours();
-      const minutes = date.getMinutes();
-      const seconds = date.getSeconds();
-
       await sendRequest(
         process.env.REACT_APP_BACKEND_URL + "/messages/post",
         "POST",
@@ -257,8 +285,9 @@ const PlayerItem = (props) => {
           "Content-Type": "application/json",
           Authorization: "Bearer " + auth.token,
         }
-      );
+      )/* ]) */;
       props.onDelete(props.id);
+      props.onUpdate();
     } catch (err) {}
   };
   const retirarOfertaHandler = async () => {
@@ -296,7 +325,7 @@ const PlayerItem = (props) => {
       const PresupuestoUser = responsePresupuestoUser.users
         .filter((user) => user.id === auth.userId)
         .map((user) => user.presupuesto);
-      await sendRequest(
+      await Promise.all([sendRequest(
         `${process.env.REACT_APP_BACKEND_URL}/players/${props.id}`,
         "PATCH",
         JSON.stringify({
@@ -306,10 +335,10 @@ const PlayerItem = (props) => {
           "Content-Type": "application/json",
           Authorization: "Bearer " + auth.token,
         }
-      );
+      ),
       /* const diferenciaClausulas =
         Number(formState.inputs.cantidad.value) - clausulaAntigua; */
-      await sendRequest(
+      sendRequest(
         `${process.env.REACT_APP_BACKEND_URL}/users/pagarclausula/${auth.userId}`,
         "PATCH",
         JSON.stringify({
@@ -319,7 +348,11 @@ const PlayerItem = (props) => {
           "Content-Type": "application/json",
           Authorization: "Bearer " + auth.token,
         }
-      );
+      )]);/* .then(values => {
+        console.log(values);
+      }).catch(reason => {
+        console.log(reason)
+      }); */
       props.onUpdate();
       //history.push("/");
     } catch (err) {}
@@ -327,6 +360,37 @@ const PlayerItem = (props) => {
   const confirmClausulaHandler = async () => {
     setShowConfirmClausulaModal(false);
     try {
+      const now = Date.now();
+      const Expires = now + addingMiliseconds;
+      const date = new Date();
+      const day = date.getDate();
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear();
+      const hour = date.getHours();
+      const minutes = date.getMinutes();
+      const seconds = date.getSeconds();
+      /* const [responsePresupuestoUser, responsePresupuestoCreator] = await Promise.all([
+        sendRequest(
+          process.env.REACT_APP_BACKEND_URL + "/users"
+        ),
+        sendRequest(
+          process.env.REACT_APP_BACKEND_URL + "/users"
+        ),
+        sendRequest(
+          `${process.env.REACT_APP_BACKEND_URL}/ofertas/get/${props.clausula}/${props.id}`,
+          "GET",
+          null,
+          {
+            Authorization: "Bearer " + auth.token,
+          }
+        )
+     ]);
+     const PresupuestoUser = responsePresupuestoUser.users
+        .filter((user) => user.id === auth.userId)
+        .map((user) => user.presupuesto);
+     const PresupuestoCreator = responsePresupuestoCreator.users
+        .filter((user) => user.id === props.creatorId)
+        .map((user) => user.presupuesto); */
       const responsePresupuestoUser = await sendRequest(
         process.env.REACT_APP_BACKEND_URL + "/users"
       );
@@ -346,6 +410,81 @@ const PlayerItem = (props) => {
         {
           Authorization: "Bearer " + auth.token,
         }
+      );
+      /* await Promise.all([
+        sendRequest(
+          `${process.env.REACT_APP_BACKEND_URL}/players/${props.id}`,
+          "DELETE",
+          null,
+          { Authorization: "Bearer " + auth.token }
+        ),
+        sendRequest(
+          `${process.env.REACT_APP_BACKEND_URL}/users/pagarclausula/${auth.userId}`,
+          "PATCH",
+          JSON.stringify({
+            presupuesto: Number(PresupuestoUser) - props.clausula,
+          }),
+          {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + auth.token,
+          }
+        ),
+        sendRequest(
+          `${process.env.REACT_APP_BACKEND_URL}/users/pagarclausula/${props.creatorId}`,
+          "PATCH",
+          JSON.stringify({
+            presupuesto: Number(PresupuestoCreator) + props.clausula,
+          }),
+          {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + auth.token,
+          }
+        ),
+        sendRequest(
+          `${process.env.REACT_APP_BACKEND_URL}/players/${props.id}`,
+          "POST",
+          JSON.stringify({
+            title: props.title,
+            clausula: props.clausula,
+            address: props.address,
+            image: props.image,
+            Expires: Expires,
+            team: auth.userTeam,
+            clausulaInicial: props.clausulaInicial,
+            escudo: auth.userImage,
+            creatorName: auth.userName,
+            creator: auth.userId,
+          }),
+          {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + auth.token,
+          }
+        ),
+        sendRequest(
+          process.env.REACT_APP_BACKEND_URL + "/messages/post",
+          "POST",
+          JSON.stringify({
+            TransferMessage: `${auth.userName} (${
+              auth.userTeam
+            }) ha pagado la cláusula de rescisión de ${props.title} a ${
+              props.creatorName
+            } (${props.team}) por ${props.clausula} monedas. ${day}/${
+              month < 10 ? "0" + month : month
+            }/${year} ${hour < 10 ? "0" + hour : hour}:${
+              minutes < 10 ? "0" + minutes : minutes
+            }:${seconds < 10 ? "0" + seconds : seconds}`,
+          }),
+          {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + auth.token,
+          }
+        )
+      ]); */
+      await sendRequest(
+        `${process.env.REACT_APP_BACKEND_URL}/players/${props.id}`,
+        "DELETE",
+        null,
+        { Authorization: "Bearer " + auth.token }
       );
       await sendRequest(
         `${process.env.REACT_APP_BACKEND_URL}/users/pagarclausula/${auth.userId}`,
@@ -371,14 +510,6 @@ const PlayerItem = (props) => {
       );
       await sendRequest(
         `${process.env.REACT_APP_BACKEND_URL}/players/${props.id}`,
-        "DELETE",
-        null,
-        { Authorization: "Bearer " + auth.token }
-      );
-      const now = Date.now();
-      const Expires = now + addingMiliseconds;
-      await sendRequest(
-        `${process.env.REACT_APP_BACKEND_URL}/players/${props.id}`,
         "POST",
         JSON.stringify({
           title: props.title,
@@ -397,15 +528,6 @@ const PlayerItem = (props) => {
           Authorization: "Bearer " + auth.token,
         }
       );
-
-      const date = new Date();
-      const day = date.getDate();
-      const month = date.getMonth() + 1;
-      const year = date.getFullYear();
-      const hour = date.getHours();
-      const minutes = date.getMinutes();
-      const seconds = date.getSeconds();
-
       await sendRequest(
         process.env.REACT_APP_BACKEND_URL + "/messages/post",
         "POST",
@@ -526,15 +648,14 @@ const PlayerItem = (props) => {
             <Button inverse onClick={cancelDeleteHandler}>
               NO DESCARTAR
             </Button>
-            <Button danger onClick={confirmDeleteHandler} disabled>
+            <Button danger onClick={confirmDeleteHandler} disabled={props.Expires > ahora || auth.userTeam ==="Equipo no asignado" || date >= endDateSummerTransfer && date < initDateWinterTransfer && auth.userTeam !== "Admin" || date >= endDateWinterTransfer && date < initDateSummerTransfer && auth.userTeam !== "Admin"}>
               DESCARTAR
             </Button>
           </React.Fragment>
         }
       >
         <p>
-          ¿Estás seguro de que quieres descartar al jugador? No recibirás
-          compensación económica alguna.
+          ¿Estás seguro de que quieres descartar al jugador? Recibirás como compensación el 30% del importe de su actual cláusula.
         </p>
       </Modal>
       <Modal
@@ -547,7 +668,8 @@ const PlayerItem = (props) => {
             <Button inverse onClick={cancelClausulaHandler}>
               NO PAGAR CLÁUSULA
             </Button>
-            <Button danger onClick={confirmClausulaHandler} disabled>
+            <Button danger onClick={confirmClausulaHandler} 
+            disabled={props.address==="POR" || auth.userTeam==="Equipo no asignado" || ahora < props.Expires && auth.userTeam !== "Admin" || date >= endDateSummerTransfer && date < nextMonthinitDateSummerTransfer && auth.userTeam !== "Admin"}>
               PAGAR CLÁUSULA
             </Button>
           </React.Fragment>
@@ -565,7 +687,9 @@ const PlayerItem = (props) => {
             <Button inverse onClick={cancelClausulaHandler}>
               CANCELAR
             </Button>
-            <Button danger onClick={confirmFreeBuyHandler} disabled={auth.userTeam="Equipo no asignado"}>
+            <Button danger onClick={confirmFreeBuyHandler} 
+            disabled={auth.userTeam === "Equipo no asignado" || auth.userTeam !== "Admin" && props.title === "Prueba2(NO ME FICHES)" || auth.userTeam !== "Admin" && props.title === "Prueba1" || auth.userId === props.ownerDiscard && ahora < props.discardExpiresDate || date >= endDateSummerTransfer && date < initDateWinterTransfer  && auth.userTeam !== "Admin" || date >= endDateWinterTransfer && date < initDateSummerTransfer && auth.userTeam !== "Admin"}
+            /* disabled={auth.userId === props.ownerDiscard && ahora < props.discardExpiresDate || auth.userTeam ==="Equipo no asignado" || date < initDateSummerTransfer && auth.userTeam !== "Admin" || date >= endDateSummerTransfer && auth.userTeam !== "Admin" || date < initDateWinterTransfer && auth.userTeam !== "Admin" || date >= endDateWinterTransfer && auth.userTeam !== "Admin"} */>
               FICHAR GRATIS
             </Button>
           </React.Fragment>
@@ -729,7 +853,7 @@ const PlayerItem = (props) => {
           <Button
             type="button"
             /* disabled={!formState.isValid} */
-            disabled={/* ahora > 13 &&  *//* props.team !== "Admin" || */ quantity <= 0 || !(/^[0-9]*$/.test(quantity))}
+            disabled={/* ahora > 13 &&  *//* props.team !== "Admin" || */ quantity <= 0 || !(/^[0-9]*$/.test(quantity)) || props.address==="POR"}
             onClick={confirmSubirClausulaHandler}
           >
             SUBIR CLÁUSULA
@@ -931,7 +1055,7 @@ const PlayerItem = (props) => {
                 <Button
                   danger
                   onClick={showClausulaWarningHandler}
-                  disabled={ahora < props.Expires}
+                  disabled={props.address==="POR" || auth.userTeam==="Equipo no asignado" || ahora < props.Expires && auth.userTeam !== "Admin" || date >= endDateSummerTransfer && date < nextMonthinitDateSummerTransfer && auth.userTeam !== "Admin"}
                 >
                   PAGAR CLÁUSULA
                 </Button>
@@ -942,11 +1066,8 @@ const PlayerItem = (props) => {
                 <Button
                   danger
                   onClick={showFreeBuyWarningHandler}
-                  disabled={
-                    auth.userId === props.ownerDiscard &&
-                    ahora < props.discardExpiresDate
-                  }
-                  disabled={auth.userTeam="Equipo no asignado"}
+                  disabled={auth.userTeam === "Equipo no asignado" || auth.userTeam !== "Admin" && props.title === "Prueba2(NO ME FICHES)" || auth.userTeam !== "Admin" && props.title === "Prueba1" || auth.userId === props.ownerDiscard && ahora < props.discardExpiresDate || date >= endDateSummerTransfer && date < initDateWinterTransfer  && auth.userTeam !== "Admin" || date >= endDateWinterTransfer && date < initDateSummerTransfer  && auth.userTeam !== "Admin"}
+                  /* disabled={auth.userId === props.ownerDiscard && ahora < props.discardExpiresDate || auth.userTeam ==="Equipo no asignado" || date < initDateSummerTransfer && auth.userTeam !== "Admin" || date >= endDateSummerTransfer && auth.userTeam !== "Admin" || date < initDateWinterTransfer && auth.userTeam !== "Admin" || date >= endDateWinterTransfer && auth.userTeam !== "Admin"} */
                 >
                   FICHAR GRATIS
                 </Button>
@@ -955,7 +1076,7 @@ const PlayerItem = (props) => {
               auth.userId !== props.creatorId &&
               /* props.team !== "Sin equipo" && */
               props.creatorName !== "Agente Libre" && (
-                <Button onClick={openOfertaHandler} disabled>
+                <Button onClick={openOfertaHandler} disabled={auth.userTeam ==="Equipo no asignado" || date >= endDateSummerTransfer && date < initDateWinterTransfer  && auth.userTeam !== "Admin" || date >= endDateWinterTransfer && date < initDateSummerTransfer && auth.userTeam !== "Admin"}>
                   {loadedOfertas &&
                   loadedOfertas.filter(
                     (oferta) => oferta.ofertanteId === auth.userId
@@ -977,7 +1098,7 @@ const PlayerItem = (props) => {
                 <Button onClick={retirarOfertaHandler}>RETIRAR OFERTA</Button>
               )}
             {auth.userId === props.creatorId && (
-              <Button onClick={showSubirClausulaHandler}>SUBIR CLÁUSULA</Button>
+              <Button onClick={showSubirClausulaHandler} disabled={props.address==="POR"}>SUBIR CLÁUSULA</Button>
             )}
             {auth.userId === props.creatorId &&
               props.transferible === false && (
@@ -991,7 +1112,8 @@ const PlayerItem = (props) => {
               </Button>
             )}
             {auth.userId === props.creatorId && (
-              <Button danger onClick={showDeleteWarningHandler} disabled>
+              <Button danger onClick={showDeleteWarningHandler} 
+              disabled={props.Expires > ahora || auth.userTeam ==="Equipo no asignado" || date >= endDateSummerTransfer && date < initDateWinterTransfer && auth.userTeam !== "Admin" || date >= endDateWinterTransfer && date < initDateSummerTransfer && auth.userTeam !== "Admin"}>
                 DESCARTAR JUGADOR
               </Button>
             )}

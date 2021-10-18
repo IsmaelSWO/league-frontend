@@ -2,6 +2,7 @@ import React from "react";
 import "./SearchBox.css";
 
 const SearchBox = (props) => {
+  const ahora = Date.now();
   return (
     <div className="search-container">
       <div className="label-container">
@@ -84,6 +85,30 @@ const SearchBox = (props) => {
         </select>
       </div>
       <div className="label-container">
+        <label htmlFor="searchTransferible">Transferible</label>
+        <select
+          id="searchTransferible"
+          className="search"
+          onChange={props.searchTransferible}
+        >
+          <option value="">Indiferente</option>
+          <option value="true">Sí</option>
+          <option value="false">No</option>
+        </select>
+      </div>
+      {/* <div className="label-container">
+        <label htmlFor="searchClausulable">Clausulable</label>
+        <select
+          id="searchClausulable"
+          className="search"
+          onChange={props.searchClausulable}
+        >
+          <option value="">Indiferente</option>
+          <option value="Si">Sí</option>
+          <option value="No">No</option>
+        </select>
+      </div> */}
+      <div className="label-container">
         <label htmlFor="clausulaminima">Cláusula minima</label>
         <input
           id="clausulaminima"
@@ -98,7 +123,7 @@ const SearchBox = (props) => {
       </div>
 
       <div className="label-container">
-        <label htmlFor="clausulamaxima">Cláusula máxima </label>
+        <label htmlFor="clausulamaxima">Cláusula máxima</label>
         <input
           id="clausulamaxima"
           className="search"

@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@900&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Alfa+Slab+One&display=swap');
 .place-item {
   margin: 1rem 1rem;
 }
@@ -48,13 +49,13 @@
   background-image: url("https://i.imgur.com/KvN3f6c.jpg");
   background-repeat: no-repeat;
   background-size: cover;
+  background-position: center;
   width: 100%;
   min-width: 19rem;
-  background-position: center;
 }
 
 .place-item__info {
-  padding: 1rem;
+  padding: 0.5rem;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -63,7 +64,7 @@
 }
 
 .vital-info {
-  padding: 1rem;
+  padding: 0.5rem;
   text-align: center;
   display: flex;
   flex-direction: row;

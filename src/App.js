@@ -18,6 +18,7 @@ const UsersTercera = React.lazy(() => import("./users/pages/UsersTercera"));
 const UsersCuarta = React.lazy(() => import("./users/pages/UsersCuarta"));
 const Auth = React.lazy(() => import("./users/pages/Auth"));
 const TransferWall = React.lazy(() => import("./messages/pages/TransferWall"));
+const MyMovements = React.lazy(() => import("./messages/pages/MyMovements"));
 const OfertasRealizadas = React.lazy(() =>
   import("./ofertas/pages/OfertasRealizadas")
 );
@@ -49,11 +50,14 @@ const App = () => {
         <Route path="/" exact>
           <Users></Users>
         </Route>
-        <Route path="/players/mercado" exact>
+        {/* <Route path="/players/mercado" exact>
           <MercadoPlayers></MercadoPlayers>
-        </Route>
+        </Route> */}
         <Route path="/:userId/players" exact>
           <UserPlayers></UserPlayers>
+        </Route>
+        <Route path="/get/mismovimientos" exact>
+          <MyMovements></MyMovements>
         </Route>
         <Route path="/get/muro" exact>
           <TransferWall></TransferWall>
