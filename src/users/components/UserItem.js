@@ -10,11 +10,24 @@ const UserItem = (props) => {
       <Card className="user-item__content">
         <Link to={`/${props.id}/players`}>
           <div className="user-item__image">
-            <Avatar image={props.image} alt={props.name} referrerPolicy={props.referrerPolicy}></Avatar>
+            <Avatar
+              image={props.image}
+              alt={props.name}
+              referrerPolicy={props.referrerPolicy}
+            ></Avatar>
           </div>
           <div className="user-item__info">
             <h2>{props.equipo}</h2>
             <h4>{props.name}</h4>
+            <div className="Presupuesto-user">
+              <h5>{props.presupuesto}</h5>
+              <div className="money-img_user">
+                <img
+                  src={require("../../icons/sinchronize-xxl.png")}
+                  alt={props.presupuesto}
+                ></img>
+              </div>
+            </div>
             <h3>
               {props.playerCount}{" "}
               {props.playerCount === 1 ? "Jugador" : "Jugadores"}
