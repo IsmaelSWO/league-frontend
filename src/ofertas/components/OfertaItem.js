@@ -15,7 +15,7 @@ const OfertaItem = (props) => {
   const month = date.getMonth();
   const year = date.getFullYear();
   const initDateSummerTransfer = new Date(year, month, 15, 22, 30);
-  const endDateSummerTransfer = new Date(year, month, 18, 22, 30);
+  const endDateSummerTransfer = new Date(year, month, 19, 22, 30);
   const initDateWinterTransfer = new Date(year, month+1, 1, 22, 30);
   const endDateWinterTransfer = new Date(year, month, 4, 22, 30); 
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
@@ -97,6 +97,7 @@ const OfertaItem = (props) => {
           title: responsePlayer.player.title,
           clausula: props.cantidad,
           address: responsePlayer.player.address,
+          posIndex: responsePlayer.posIndex,
           image: responsePlayer.player.image,
           Expires: Expires,
           clausulaInicial: responsePlayer.player.clausulaInicial,

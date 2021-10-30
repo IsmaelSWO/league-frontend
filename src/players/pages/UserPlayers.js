@@ -20,7 +20,8 @@ const UserPlayers = () => {
         const responseData = await sendRequest(
           `${process.env.REACT_APP_BACKEND_URL}/players/user/${userId}`
         );
-        setLoadedPlayers(responseData.players);
+        setLoadedPlayers(responseData.players.sort((a, b) => parseFloat(a.posIndex) - parseFloat(b.posIndex))
+        );
         /* const userHasOffers = await sendRequest(
           `${process.env.REACT_APP_BACKEND_URL}/ofertas/get/receivedOffers/${auth.userId}`
         );

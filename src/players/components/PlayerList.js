@@ -76,6 +76,7 @@ const PlayerList = (props) => {
             transferible={player.transferible}
             marketValue={player.marketValue}
             address={player.address}
+            posIndex={player.posIndex}
             team={player.team}
             discardExpiresDate={player.discardExpiresDate}
             clausulaInicial={player.clausulaInicial}

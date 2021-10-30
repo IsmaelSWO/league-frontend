@@ -24,7 +24,7 @@ const PlayerItem = (props) => {
   const year = date.getFullYear();
   const initDateSummerTransfer = new Date(year, month, 15, 22, 30);
   const nextMonthinitDateSummerTransfer = new Date(year, month+1, 15, 22, 30);
-  const endDateSummerTransfer = new Date(year, month, 18, 22, 30);
+  const endDateSummerTransfer = new Date(year, month, 19, 22, 30);
   const initDateWinterTransfer = new Date(year, month+1, 1, 22, 30);
   const endDateWinterTransfer = new Date(year, month, 4, 22, 30); 
   const [quantity, setQuantity] = useState(0);
@@ -168,6 +168,7 @@ const PlayerItem = (props) => {
           title: props.title,
           clausula: props.clausulaInicial,
           address: props.address,
+          posIndex: props.posIndex,
           image: props.image,
           escudo: auth.userImage,
           clausulaInicial: props.clausulaInicial,
@@ -255,6 +256,7 @@ const PlayerItem = (props) => {
           title: props.title,
           clausula: props.clausulaInicial,
           address: props.address,
+          posIndex: props.posIndex,
           image: props.image,
           escudo: "https://i.imgur.com/mhqxl7l.png",
           Expires: Expires,
@@ -515,6 +517,7 @@ const PlayerItem = (props) => {
           title: props.title,
           clausula: props.clausula,
           address: props.address,
+          posIndex: props.posIndex,
           image: props.image,
           Expires: Expires,
           team: auth.userTeam,

@@ -71,9 +71,25 @@ const Auth = () => {
             password: formState.inputs.password.value,
           }),
           {
-            /* "Content-Type": "application/json", */
+            "Content-Type": "application/json",
           }
         );
+        /* const responseData = await fetch(
+          process.env.REACT_APP_BACKEND_URL + "/users/login",
+          "POST",
+          JSON.stringify({
+            email: formState.inputs.email.value,
+            password: formState.inputs.password.value,
+          }),
+          {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers":
+            "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+            "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE"
+          }
+        ); */
+        
         auth.login(
           responseData.userId,
           responseData.token,
