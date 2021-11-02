@@ -23,10 +23,10 @@ const PlayerItem = (props) => {
   const month = date.getMonth();
   const year = date.getFullYear();
   const initDateSummerTransfer = new Date(year, month, 15, 22, 30);
-  const nextMonthinitDateSummerTransfer = new Date(year, month+1, 15, 22, 30);
-  const endDateSummerTransfer = new Date(year, month, 19, 22, 30);
-  const initDateWinterTransfer = new Date(year, month+1, 1, 22, 30);
-  const endDateWinterTransfer = new Date(year, month, 4, 22, 30); 
+  const nextMonthinitDateSummerTransfer = new Date(year, month + 1, 15, 22, 30);
+  const endDateSummerTransfer = new Date(year, month, 18, 22, 30);
+  const initDateWinterTransfer = new Date(year, month + 1, 1, 22, 30);
+  const endDateWinterTransfer = new Date(year, month, 4, 22, 30);
   const [quantity, setQuantity] = useState(0);
   const addingMiliseconds = 604800000;
   const ahora = Date.now();
@@ -153,52 +153,57 @@ const PlayerItem = (props) => {
       const hour = date.getHours();
       const minutes = date.getMinutes();
       const seconds = date.getSeconds();
-      await Promise.all([sendRequest(
-        `${process.env.REACT_APP_BACKEND_URL}/players/delete/${props.id}/${auth.userId}`,
-        "DELETE",
-        null,
-        {
-          Authorization: "Bearer " + auth.token,
-        }
-      ),
-      sendRequest(
-        `${process.env.REACT_APP_BACKEND_URL}/players/${props.id}`,
-        "POST",
-        JSON.stringify({
-          title: props.title,
-          clausula: props.clausulaInicial,
-          address: props.address,
-          posIndex: props.posIndex,
-          image: props.image,
-          escudo: auth.userImage,
-          clausulaInicial: props.clausulaInicial,
-          Expires: Expires,
-          team: auth.userTeam,
-          creatorName: auth.userName,
-          creator: auth.userId,
-        }),
-        {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + auth.token,
-        }
-      ),
-      sendRequest(
-        process.env.REACT_APP_BACKEND_URL + "/messages/post",
-        "POST",
-        JSON.stringify({
-          TransferMessage: `${auth.userName} (${
-            auth.userTeam
-          }) ha fichado a coste cero al descarte ${props.title}. ${day}/${
-            month < 10 ? "0" + month : month
-          }/${year} ${hour < 10 ? "0" + hour : hour}:${
-            minutes < 10 ? "0" + minutes : minutes
-          }:${seconds < 10 ? "0" + seconds : seconds}`,
-        }),
-        {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + auth.token,
-        }
-      )]);/* then(values => {
+      await Promise.all([
+        sendRequest(
+          `${process.env.REACT_APP_BACKEND_URL}/players/delete/${props.id}/${auth.userId}`,
+          "DELETE",
+          JSON.stringify({
+            actionType: "Mercado fichajes",
+          }),
+          {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + auth.token,
+          }
+        ),
+        sendRequest(
+          `${process.env.REACT_APP_BACKEND_URL}/players/${props.id}`,
+          "POST",
+          JSON.stringify({
+            title: props.title,
+            clausula: props.clausulaInicial,
+            address: props.address,
+            posIndex: props.posIndex,
+            image: props.image,
+            escudo: auth.userImage,
+            clausulaInicial: props.clausulaInicial,
+            Expires: Expires,
+            team: auth.userTeam,
+            creatorName: auth.userName,
+            creator: auth.userId,
+          }),
+          {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + auth.token,
+          }
+        ),
+        sendRequest(
+          process.env.REACT_APP_BACKEND_URL + "/messages/post",
+          "POST",
+          JSON.stringify({
+            TransferMessage: `${auth.userName} (${
+              auth.userTeam
+            }) ha fichado a coste cero al descarte ${props.title}. ${day}/${
+              month < 10 ? "0" + month : month
+            }/${year} ${hour < 10 ? "0" + hour : hour}:${
+              minutes < 10 ? "0" + minutes : minutes
+            }:${seconds < 10 ? "0" + seconds : seconds}`,
+          }),
+          {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + auth.token,
+          }
+        ),
+      ]); /* then(values => {
         console.log(values);
       }).catch(reason => {
         console.log(reason)
@@ -218,7 +223,7 @@ const PlayerItem = (props) => {
         .filter((user) => user.id === auth.userId)
         .map((user) => user.presupuesto);
 
-      const discardWin = Number(props.clausula) * 0.30;
+      const discardWin = Number(props.clausula) * 0.3;
       const now = Date.now();
       const weekMiliseconds = 604800000;
       const Expires = now + addingMiliseconds;
@@ -233,12 +238,15 @@ const PlayerItem = (props) => {
       await sendRequest(
         `${process.env.REACT_APP_BACKEND_URL}/players/${props.id}`,
         "DELETE",
-        null,
+        JSON.stringify({
+          actionType: "Mercado fichajes",
+        }),
         {
+          "Content-Type": "application/json",
           Authorization: "Bearer " + auth.token,
         }
       );
-		  await sendRequest(
+      await sendRequest(
         `${process.env.REACT_APP_BACKEND_URL}/users/pagarclausula/${auth.userId}`,
         "PATCH",
         JSON.stringify({
@@ -287,7 +295,7 @@ const PlayerItem = (props) => {
           "Content-Type": "application/json",
           Authorization: "Bearer " + auth.token,
         }
-      )/* ]) */;
+      ) /* ]) */;
       props.onDelete(props.id);
       props.onUpdate();
     } catch (err) {}
@@ -300,8 +308,11 @@ const PlayerItem = (props) => {
       await sendRequest(
         `${process.env.REACT_APP_BACKEND_URL}/ofertas/${identifiedOferta}`,
         "DELETE",
-        null,
+        JSON.stringify({
+          actionType: "Mercado fichajes",
+        }),
         {
+          "Content-Type": "application/json",
           Authorization: "Bearer " + auth.token,
         }
       );
@@ -313,11 +324,10 @@ const PlayerItem = (props) => {
   };
   const confirmSubirClausulaHandler = async () => {
     setShowSubirClausulaModal(false);
-    let filteredQuantity = quantity
-    if (quantity > 0 || quantity < 0 && quantity <=-1) {
-     filteredQuantity = Math.round(Number(quantity));
-    }
-    else {
+    let filteredQuantity = quantity;
+    if (quantity > 0 || (quantity < 0 && quantity <= -1)) {
+      filteredQuantity = Math.round(Number(quantity));
+    } else {
       filteredQuantity = Math.round(Number(quantity)) - 5;
     }
     try {
@@ -327,30 +337,32 @@ const PlayerItem = (props) => {
       const PresupuestoUser = responsePresupuestoUser.users
         .filter((user) => user.id === auth.userId)
         .map((user) => user.presupuesto);
-      await Promise.all([sendRequest(
-        `${process.env.REACT_APP_BACKEND_URL}/players/${props.id}`,
-        "PATCH",
-        JSON.stringify({
-          clausula: clausulaAntigua + filteredQuantity,
-        }),
-        {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + auth.token,
-        }
-      ),
-      /* const diferenciaClausulas =
+      await Promise.all([
+        sendRequest(
+          `${process.env.REACT_APP_BACKEND_URL}/players/${props.id}`,
+          "PATCH",
+          JSON.stringify({
+            clausula: clausulaAntigua + filteredQuantity,
+          }),
+          {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + auth.token,
+          }
+        ),
+        /* const diferenciaClausulas =
         Number(formState.inputs.cantidad.value) - clausulaAntigua; */
-      sendRequest(
-        `${process.env.REACT_APP_BACKEND_URL}/users/pagarclausula/${auth.userId}`,
-        "PATCH",
-        JSON.stringify({
-          presupuesto: Number(PresupuestoUser) - filteredQuantity,
-        }),
-        {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + auth.token,
-        }
-      )]);/* .then(values => {
+        sendRequest(
+          `${process.env.REACT_APP_BACKEND_URL}/users/pagarclausula/${auth.userId}`,
+          "PATCH",
+          JSON.stringify({
+            presupuesto: Number(PresupuestoUser) - filteredQuantity,
+          }),
+          {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + auth.token,
+          }
+        ),
+      ]); /* .then(values => {
         console.log(values);
       }).catch(reason => {
         console.log(reason)
@@ -371,28 +383,26 @@ const PlayerItem = (props) => {
       const hour = date.getHours();
       const minutes = date.getMinutes();
       const seconds = date.getSeconds();
-      /* const [responsePresupuestoUser, responsePresupuestoCreator] = await Promise.all([
-        sendRequest(
-          process.env.REACT_APP_BACKEND_URL + "/users"
-        ),
-        sendRequest(
-          process.env.REACT_APP_BACKEND_URL + "/users"
-        ),
-        sendRequest(
-          `${process.env.REACT_APP_BACKEND_URL}/ofertas/get/${props.clausula}/${props.id}`,
-          "GET",
-          null,
-          {
-            Authorization: "Bearer " + auth.token,
-          }
-        )
-     ]);
-     const PresupuestoUser = responsePresupuestoUser.users
+      /* const [responsePresupuestoUser, responsePresupuestoCreator] =
+        await Promise.all([
+          sendRequest(process.env.REACT_APP_BACKEND_URL + "/users"),
+          sendRequest(process.env.REACT_APP_BACKEND_URL + "/users"),
+          sendRequest(
+            `${process.env.REACT_APP_BACKEND_URL}/ofertas/get/${props.clausula}/${props.id}`,
+            "GET",
+            null,
+            {
+              Authorization: "Bearer " + auth.token,
+            }
+          ),
+        ]);
+      const PresupuestoUser = responsePresupuestoUser.users
         .filter((user) => user.id === auth.userId)
         .map((user) => user.presupuesto);
-     const PresupuestoCreator = responsePresupuestoCreator.users
+      const PresupuestoCreator = responsePresupuestoCreator.users
         .filter((user) => user.id === props.creatorId)
         .map((user) => user.presupuesto); */
+
       const responsePresupuestoUser = await sendRequest(
         process.env.REACT_APP_BACKEND_URL + "/users"
       );
@@ -413,12 +423,18 @@ const PlayerItem = (props) => {
           Authorization: "Bearer " + auth.token,
         }
       );
+
       /* await Promise.all([
         sendRequest(
           `${process.env.REACT_APP_BACKEND_URL}/players/${props.id}`,
           "DELETE",
-          null,
-          { Authorization: "Bearer " + auth.token }
+          JSON.stringify({
+            actionType: "Clausulazo",
+          }),
+          {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + auth.token,
+          }
         ),
         sendRequest(
           `${process.env.REACT_APP_BACKEND_URL}/users/pagarclausula/${auth.userId}`,
@@ -449,6 +465,7 @@ const PlayerItem = (props) => {
             title: props.title,
             clausula: props.clausula,
             address: props.address,
+            posIndex: props.posIndex,
             image: props.image,
             Expires: Expires,
             team: auth.userTeam,
@@ -480,13 +497,19 @@ const PlayerItem = (props) => {
             "Content-Type": "application/json",
             Authorization: "Bearer " + auth.token,
           }
-        )
+        ),
       ]); */
+
       await sendRequest(
         `${process.env.REACT_APP_BACKEND_URL}/players/${props.id}`,
         "DELETE",
-        null,
-        { Authorization: "Bearer " + auth.token }
+        JSON.stringify({
+          actionType: "Clausulazo",
+        }),
+        {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + auth.token,
+        }
       );
       await sendRequest(
         `${process.env.REACT_APP_BACKEND_URL}/users/pagarclausula/${auth.userId}`,
@@ -651,14 +674,28 @@ const PlayerItem = (props) => {
             <Button inverse onClick={cancelDeleteHandler}>
               NO DESCARTAR
             </Button>
-            <Button danger onClick={confirmDeleteHandler} disabled={props.Expires > ahora || auth.userTeam ==="Equipo no asignado" || date >= endDateSummerTransfer && date < initDateWinterTransfer && auth.userTeam !== "Admin" || date >= endDateWinterTransfer && date < initDateSummerTransfer && auth.userTeam !== "Admin"}>
+            <Button
+              danger
+              onClick={confirmDeleteHandler}
+              disabled={
+                props.Expires > ahora ||
+                auth.userTeam === "Equipo no asignado" ||
+                (date >= endDateSummerTransfer &&
+                  date < initDateWinterTransfer &&
+                  auth.userTeam !== "Admin") ||
+                (date >= endDateWinterTransfer &&
+                  date < initDateSummerTransfer &&
+                  auth.userTeam !== "Admin")
+              }
+            >
               DESCARTAR
             </Button>
           </React.Fragment>
         }
       >
         <p>
-          ¿Estás seguro de que quieres descartar al jugador? Recibirás como compensación el 30% del importe de su actual cláusula.
+          ¿Estás seguro de que quieres descartar al jugador? Recibirás como
+          compensación el 30% del importe de su actual cláusula.
         </p>
       </Modal>
       <Modal
@@ -671,8 +708,18 @@ const PlayerItem = (props) => {
             <Button inverse onClick={cancelClausulaHandler}>
               NO PAGAR CLÁUSULA
             </Button>
-            <Button danger onClick={confirmClausulaHandler} 
-            disabled={props.address==="POR" || auth.userTeam==="Equipo no asignado" || ahora < props.Expires && auth.userTeam !== "Admin" || date >= endDateSummerTransfer && date < nextMonthinitDateSummerTransfer && auth.userTeam !== "Admin"}>
+            <Button
+              danger
+              onClick={confirmClausulaHandler}
+              disabled={
+                props.address === "POR" ||
+                auth.userTeam === "Equipo no asignado" ||
+                (ahora < props.Expires && auth.userTeam !== "Admin") ||
+                (date >= endDateSummerTransfer &&
+                  date < nextMonthinitDateSummerTransfer &&
+                  auth.userTeam !== "Admin")
+              }
+            >
               PAGAR CLÁUSULA
             </Button>
           </React.Fragment>
@@ -690,9 +737,25 @@ const PlayerItem = (props) => {
             <Button inverse onClick={cancelClausulaHandler}>
               CANCELAR
             </Button>
-            <Button danger onClick={confirmFreeBuyHandler} 
-            disabled={auth.userTeam === "Equipo no asignado" || auth.userTeam !== "Admin" && props.title === "Prueba2(NO ME FICHES)" || auth.userTeam !== "Admin" && props.title === "Prueba1" || auth.userId === props.ownerDiscard && ahora < props.discardExpiresDate || date >= endDateSummerTransfer && date < initDateWinterTransfer  && auth.userTeam !== "Admin" || date >= endDateWinterTransfer && date < initDateSummerTransfer && auth.userTeam !== "Admin"}
-            /* disabled={auth.userId === props.ownerDiscard && ahora < props.discardExpiresDate || auth.userTeam ==="Equipo no asignado" || date < initDateSummerTransfer && auth.userTeam !== "Admin" || date >= endDateSummerTransfer && auth.userTeam !== "Admin" || date < initDateWinterTransfer && auth.userTeam !== "Admin" || date >= endDateWinterTransfer && auth.userTeam !== "Admin"} */>
+            <Button
+              danger
+              onClick={confirmFreeBuyHandler}
+              disabled={
+                auth.userTeam === "Equipo no asignado" ||
+                (auth.userTeam !== "Admin" &&
+                  props.title === "Prueba2(NO ME FICHES)") ||
+                (auth.userTeam !== "Admin" && props.title === "Prueba1") ||
+                (auth.userId === props.ownerDiscard &&
+                  ahora < props.discardExpiresDate) ||
+                (date >= endDateSummerTransfer &&
+                  date < initDateWinterTransfer &&
+                  auth.userTeam !== "Admin") ||
+                (date >= endDateWinterTransfer &&
+                  date < initDateSummerTransfer &&
+                  auth.userTeam !== "Admin")
+              }
+              /* disabled={auth.userId === props.ownerDiscard && ahora < props.discardExpiresDate || auth.userTeam ==="Equipo no asignado" || date < initDateSummerTransfer && auth.userTeam !== "Admin" || date >= endDateSummerTransfer && auth.userTeam !== "Admin" || date < initDateWinterTransfer && auth.userTeam !== "Admin" || date >= endDateWinterTransfer && auth.userTeam !== "Admin"} */
+            >
               FICHAR GRATIS
             </Button>
           </React.Fragment>
@@ -844,19 +907,38 @@ const PlayerItem = (props) => {
           onInput={inputHandler}
           onChange={e => setQuantity(e.target.value) }
         ></Input>} */}
-        <div className="center"><input type="number" value={quantity} onChange={e => setQuantity(e.target.value)} min="0" step="1"/></div>
-        {!(/^[0-9]*$/.test(quantity)) &&
+        <div className="center">
+          <input
+            type="number"
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
+            min="0"
+            step="1"
+          />
+        </div>
+        {!/^[0-9]*$/.test(quantity) && (
           <div className="validate center">Introduce un número entero</div>
-        }
-        {quantity <= 0 &&
+        )}
+        {quantity <= 0 && (
           <div className="validate center">Introduce un número positivo</div>
-        }
-        <div className="player_clause center">La nueva cláusula de rescisión sería de {quantity && /^[0-9]*$/.test(quantity) > 0 ? clausulaAntigua + Math.round(Number(quantity)) : clausulaAntigua} monedas</div>
+        )}
+        <div className="player_clause center">
+          La nueva cláusula de rescisión sería de{" "}
+          {quantity && /^[0-9]*$/.test(quantity) > 0
+            ? clausulaAntigua + Math.round(Number(quantity))
+            : clausulaAntigua}{" "}
+          monedas
+        </div>
         <div className="center">
           <Button
             type="button"
             /* disabled={!formState.isValid} */
-            disabled={/* ahora > 13 &&  *//* props.team !== "Admin" || */ quantity <= 0 || !(/^[0-9]*$/.test(quantity)) || props.address==="POR"}
+            disabled={
+              /* ahora > 13 &&  */ /* props.team !== "Admin" || */ quantity <=
+                0 ||
+              !/^[0-9]*$/.test(quantity) ||
+              props.address === "POR"
+            }
             onClick={confirmSubirClausulaHandler}
           >
             SUBIR CLÁUSULA
@@ -883,9 +965,9 @@ const PlayerItem = (props) => {
               ? "psg-item__content"
               : props.team === "Valencia"
               ? "valencia-item__content"
-              :  */props.team === "Sin equipo"
+              :  */ props.team === "Sin equipo"
               ? "freeagent-item__content"
-              /* : props.team === "Atlético de Madrid"
+              : /* : props.team === "Atlético de Madrid"
               ? "atletico-item__content"
               : props.team === "RB Leipzig"
               ? "leipzig-item__content"
@@ -919,31 +1001,39 @@ const PlayerItem = (props) => {
               ? "villarreal-item__content"
               : props.team === "Olympique Lyonnais"
               ? "lyon-item__content" */
-              : "newManager-item__content"
+                "newManager-item__content"
           }
         >
           {isLoading && <LoadingSpinner asOverlay></LoadingSpinner>}
-          <div className={props.address === "POR"
-                  ? "place-item__image POR-background"
-                  : props.address === "MC" ||
-                    props.address === "MCO" ||
-                    props.address === "MCD" ||
-                    props.address === "MD" ||
-                    props.address === "MI"
-                  ? "place-item__image MC-background"
-                  : props.address === "DC" ||
-                    props.address === "ED" ||
-                    props.address === "SD" ||
-                    props.address === "EI"
-                  ? "place-item__image DC-background"
-                  : props.address === "DFC" ||
-                    props.address === "LD" ||
-                    props.address === "LI" ||
-                    props.address === "CAR" ||
-                    props.address === "CAI"
-                  ? "place-item__image DFC-background"
-                  : ""}>
-            <img src={`https://images.weserv.nl/?url=${props.image}`} alt={props.title} referrerPolicy="no-referrer"></img>
+          <div
+            className={
+              props.address === "POR"
+                ? "place-item__image POR-background"
+                : props.address === "MC" ||
+                  props.address === "MCO" ||
+                  props.address === "MCD" ||
+                  props.address === "MD" ||
+                  props.address === "MI"
+                ? "place-item__image MC-background"
+                : props.address === "DC" ||
+                  props.address === "ED" ||
+                  props.address === "SD" ||
+                  props.address === "EI"
+                ? "place-item__image DC-background"
+                : props.address === "DFC" ||
+                  props.address === "LD" ||
+                  props.address === "LI" ||
+                  props.address === "CAR" ||
+                  props.address === "CAI"
+                ? "place-item__image DFC-background"
+                : ""
+            }
+          >
+            <img
+              src={`https://images.weserv.nl/?url=${props.image}`}
+              alt={props.title}
+              referrerPolicy="no-referrer"
+            ></img>
             <h3>{props.title}</h3>
             <div
               className={
@@ -1004,7 +1094,12 @@ const PlayerItem = (props) => {
               <div className="container-escudo">
                 <div className="escudo">
                   <div className="escudo-img">
-                    <img src={`https://images.weserv.nl/?url=${props.escudo}`} alt={props.escudo} width="80px" height="80px"></img>
+                    <img
+                      src={`https://images.weserv.nl/?url=${props.escudo}`}
+                      alt={props.escudo}
+                      width="80px"
+                      height="80px"
+                    ></img>
                   </div>
                 </div>
               </div>
@@ -1058,7 +1153,14 @@ const PlayerItem = (props) => {
                 <Button
                   danger
                   onClick={showClausulaWarningHandler}
-                  disabled={props.address==="POR" || auth.userTeam==="Equipo no asignado" || ahora < props.Expires && auth.userTeam !== "Admin" || date >= endDateSummerTransfer && date < nextMonthinitDateSummerTransfer && auth.userTeam !== "Admin"}
+                  disabled={
+                    props.address === "POR" ||
+                    auth.userTeam === "Equipo no asignado" ||
+                    (ahora < props.Expires && auth.userTeam !== "Admin") ||
+                    (date >= endDateSummerTransfer &&
+                      date < nextMonthinitDateSummerTransfer &&
+                      auth.userTeam !== "Admin")
+                  }
                 >
                   PAGAR CLÁUSULA
                 </Button>
@@ -1069,7 +1171,20 @@ const PlayerItem = (props) => {
                 <Button
                   danger
                   onClick={showFreeBuyWarningHandler}
-                  disabled={auth.userTeam === "Equipo no asignado" || auth.userTeam !== "Admin" && props.title === "Prueba2(NO ME FICHES)" || auth.userTeam !== "Admin" && props.title === "Prueba1" || auth.userId === props.ownerDiscard && ahora < props.discardExpiresDate || date >= endDateSummerTransfer && date < initDateWinterTransfer  && auth.userTeam !== "Admin" || date >= endDateWinterTransfer && date < initDateSummerTransfer  && auth.userTeam !== "Admin"}
+                  disabled={
+                    auth.userTeam === "Equipo no asignado" ||
+                    (auth.userTeam !== "Admin" &&
+                      props.title === "Prueba2(NO ME FICHES)") ||
+                    (auth.userTeam !== "Admin" && props.title === "Prueba1") ||
+                    (auth.userId === props.ownerDiscard &&
+                      ahora < props.discardExpiresDate) ||
+                    (date >= endDateSummerTransfer &&
+                      date < initDateWinterTransfer &&
+                      auth.userTeam !== "Admin") ||
+                    (date >= endDateWinterTransfer &&
+                      date < initDateSummerTransfer &&
+                      auth.userTeam !== "Admin")
+                  }
                   /* disabled={auth.userId === props.ownerDiscard && ahora < props.discardExpiresDate || auth.userTeam ==="Equipo no asignado" || date < initDateSummerTransfer && auth.userTeam !== "Admin" || date >= endDateSummerTransfer && auth.userTeam !== "Admin" || date < initDateWinterTransfer && auth.userTeam !== "Admin" || date >= endDateWinterTransfer && auth.userTeam !== "Admin"} */
                 >
                   FICHAR GRATIS
@@ -1079,7 +1194,18 @@ const PlayerItem = (props) => {
               auth.userId !== props.creatorId &&
               /* props.team !== "Sin equipo" && */
               props.creatorName !== "Agente Libre" && (
-                <Button onClick={openOfertaHandler} disabled={auth.userTeam ==="Equipo no asignado" || date >= endDateSummerTransfer && date < initDateWinterTransfer  && auth.userTeam !== "Admin" || date >= endDateWinterTransfer && date < initDateSummerTransfer && auth.userTeam !== "Admin"}>
+                <Button
+                  onClick={openOfertaHandler}
+                  disabled={
+                    auth.userTeam === "Equipo no asignado" ||
+                    (date >= endDateSummerTransfer &&
+                      date < initDateWinterTransfer &&
+                      auth.userTeam !== "Admin") ||
+                    (date >= endDateWinterTransfer &&
+                      date < initDateSummerTransfer &&
+                      auth.userTeam !== "Admin")
+                  }
+                >
                   {loadedOfertas &&
                   loadedOfertas.filter(
                     (oferta) => oferta.ofertanteId === auth.userId
@@ -1101,7 +1227,12 @@ const PlayerItem = (props) => {
                 <Button onClick={retirarOfertaHandler}>RETIRAR OFERTA</Button>
               )}
             {auth.userId === props.creatorId && (
-              <Button onClick={showSubirClausulaHandler} disabled={props.address==="POR"}>SUBIR CLÁUSULA</Button>
+              <Button
+                onClick={showSubirClausulaHandler}
+                disabled={props.address === "POR"}
+              >
+                SUBIR CLÁUSULA
+              </Button>
             )}
             {auth.userId === props.creatorId &&
               props.transferible === false && (
@@ -1115,8 +1246,20 @@ const PlayerItem = (props) => {
               </Button>
             )}
             {auth.userId === props.creatorId && (
-              <Button danger onClick={showDeleteWarningHandler} 
-              disabled={props.Expires > ahora || auth.userTeam ==="Equipo no asignado" || date >= endDateSummerTransfer && date < initDateWinterTransfer && auth.userTeam !== "Admin" || date >= endDateWinterTransfer && date < initDateSummerTransfer && auth.userTeam !== "Admin"}>
+              <Button
+                danger
+                onClick={showDeleteWarningHandler}
+                disabled={
+                  props.Expires > ahora ||
+                  auth.userTeam === "Equipo no asignado" ||
+                  (date >= endDateSummerTransfer &&
+                    date < initDateWinterTransfer &&
+                    auth.userTeam !== "Admin") ||
+                  (date >= endDateWinterTransfer &&
+                    date < initDateSummerTransfer &&
+                    auth.userTeam !== "Admin")
+                }
+              >
                 DESCARTAR JUGADOR
               </Button>
             )}
