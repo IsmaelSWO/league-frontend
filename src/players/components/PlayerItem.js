@@ -153,57 +153,57 @@ const PlayerItem = (props) => {
       const hour = date.getHours();
       const minutes = date.getMinutes();
       const seconds = date.getSeconds();
-      await Promise.all([
-        sendRequest(
-          `${process.env.REACT_APP_BACKEND_URL}/players/delete/${props.id}/${auth.userId}`,
-          "DELETE",
-          JSON.stringify({
-            actionType: "Mercado fichajes",
-          }),
-          {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + auth.token,
-          }
-        ),
-        sendRequest(
-          `${process.env.REACT_APP_BACKEND_URL}/players/${props.id}`,
-          "POST",
-          JSON.stringify({
-            title: props.title,
-            clausula: props.clausulaInicial,
-            address: props.address,
-            posIndex: props.posIndex,
-            image: props.image,
-            escudo: auth.userImage,
-            clausulaInicial: props.clausulaInicial,
-            Expires: Expires,
-            team: auth.userTeam,
-            creatorName: auth.userName,
-            creator: auth.userId,
-          }),
-          {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + auth.token,
-          }
-        ),
-        sendRequest(
-          process.env.REACT_APP_BACKEND_URL + "/messages/post",
-          "POST",
-          JSON.stringify({
-            TransferMessage: `${auth.userName} (${
-              auth.userTeam
-            }) ha fichado a coste cero al descarte ${props.title}. ${day}/${
-              month < 10 ? "0" + month : month
-            }/${year} ${hour < 10 ? "0" + hour : hour}:${
-              minutes < 10 ? "0" + minutes : minutes
-            }:${seconds < 10 ? "0" + seconds : seconds}`,
-          }),
-          {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + auth.token,
-          }
-        ),
-      ]); /* then(values => {
+
+      await sendRequest(
+        `${process.env.REACT_APP_BACKEND_URL}/players/delete/${props.id}/${auth.userId}`,
+        "DELETE",
+        JSON.stringify({
+          actionType: "Mercado fichajes",
+        }),
+        {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + auth.token,
+        }
+      );
+      await sendRequest(
+        `${process.env.REACT_APP_BACKEND_URL}/players/${props.id}`,
+        "POST",
+        JSON.stringify({
+          title: props.title,
+          clausula: props.clausulaInicial,
+          address: props.address,
+          posIndex: props.posIndex,
+          image: props.image,
+          escudo: auth.userImage,
+          clausulaInicial: props.clausulaInicial,
+          Expires: Expires,
+          team: auth.userTeam,
+          creatorName: auth.userName,
+          creator: auth.userId,
+        }),
+        {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + auth.token,
+        }
+      );
+      await sendRequest(
+        process.env.REACT_APP_BACKEND_URL + "/messages/post",
+        "POST",
+        JSON.stringify({
+          TransferMessage: `${auth.userName} (${
+            auth.userTeam
+          }) ha fichado a coste cero al descarte ${props.title}. ${day}/${
+            month < 10 ? "0" + month : month
+          }/${year} ${hour < 10 ? "0" + hour : hour}:${
+            minutes < 10 ? "0" + minutes : minutes
+          }:${seconds < 10 ? "0" + seconds : seconds}`,
+        }),
+        {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + auth.token,
+        }
+      );
+      /* then(values => {
         console.log(values);
       }).catch(reason => {
         console.log(reason)
