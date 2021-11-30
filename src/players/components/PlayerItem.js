@@ -23,9 +23,10 @@ const PlayerItem = (props) => {
   const month = date.getMonth();
   const year = date.getFullYear();
   const initDateSummerTransfer = new Date(year, month, 15, 22, 30);
-  const nextMonthinitDateSummerTransfer = new Date(year, month + 1, 15, 22, 30);
+  const initDateClausulazos = new Date(year, month, 15, 22, 30);
+  const endDateClausulazos = new Date(year, month, 17, 10, 30);
   const endDateSummerTransfer = new Date(year, month, 18, 22, 30);
-  const initDateWinterTransfer = new Date(year, month + 1, 1, 22, 30);
+  const initDateWinterTransfer = new Date(year, month, 1, 22, 30);
   const endDateWinterTransfer = new Date(year, month, 4, 22, 30);
   const [quantity, setQuantity] = useState(0);
   const addingMiliseconds = 604800000;
@@ -223,7 +224,6 @@ const PlayerItem = (props) => {
         .filter((user) => user.id === auth.userId)
         .map((user) => user.presupuesto);
 
-      const discardWin = Number(props.clausula) * 0.3;
       const now = Date.now();
       const weekMiliseconds = 604800000;
       const Expires = now + addingMiliseconds;
@@ -246,7 +246,7 @@ const PlayerItem = (props) => {
           Authorization: "Bearer " + auth.token,
         }
       );
-      await sendRequest(
+      /* await sendRequest(
         `${process.env.REACT_APP_BACKEND_URL}/users/pagarclausula/${auth.userId}`,
         "PATCH",
         JSON.stringify({
@@ -256,7 +256,7 @@ const PlayerItem = (props) => {
           "Content-Type": "application/json",
           Authorization: "Bearer " + auth.token,
         }
-      );
+      ); */
       await sendRequest(
         `${process.env.REACT_APP_BACKEND_URL}/players/discarded/${auth.userId}`,
         "POST",
@@ -337,21 +337,22 @@ const PlayerItem = (props) => {
       const PresupuestoUser = responsePresupuestoUser.users
         .filter((user) => user.id === auth.userId)
         .map((user) => user.presupuesto);
-      await Promise.all([
+      await 
         sendRequest(
           `${process.env.REACT_APP_BACKEND_URL}/players/${props.id}`,
           "PATCH",
           JSON.stringify({
-            clausula: clausulaAntigua + filteredQuantity,
+            clausula: clausulaAntigua + (filteredQuantity*2),
+            inputQuantity: filteredQuantity
           }),
           {
             "Content-Type": "application/json",
             Authorization: "Bearer " + auth.token,
           }
-        ),
+        );
         /* const diferenciaClausulas =
         Number(formState.inputs.cantidad.value) - clausulaAntigua; */
-        sendRequest(
+        await sendRequest(
           `${process.env.REACT_APP_BACKEND_URL}/users/pagarclausula/${auth.userId}`,
           "PATCH",
           JSON.stringify({
@@ -361,14 +362,9 @@ const PlayerItem = (props) => {
             "Content-Type": "application/json",
             Authorization: "Bearer " + auth.token,
           }
-        ),
-      ]); /* .then(values => {
-        console.log(values);
-      }).catch(reason => {
-        console.log(reason)
-      }); */
+        );
+         
       props.onUpdate();
-      //history.push("/");
     } catch (err) {}
   };
   const confirmClausulaHandler = async () => {
@@ -422,6 +418,9 @@ const PlayerItem = (props) => {
         {
           Authorization: "Bearer " + auth.token,
         }
+      );
+      const playerClause = await sendRequest(
+        `${process.env.REACT_APP_BACKEND_URL}/players/get/${props.id}`
       );
 
       /* await Promise.all([
@@ -515,7 +514,7 @@ const PlayerItem = (props) => {
         `${process.env.REACT_APP_BACKEND_URL}/users/pagarclausula/${auth.userId}`,
         "PATCH",
         JSON.stringify({
-          presupuesto: Number(PresupuestoUser) - props.clausula,
+          presupuesto: Number(PresupuestoUser) - playerClause.player.clausula,
         }),
         {
           "Content-Type": "application/json",
@@ -526,7 +525,7 @@ const PlayerItem = (props) => {
         `${process.env.REACT_APP_BACKEND_URL}/users/pagarclausula/${props.creatorId}`,
         "PATCH",
         JSON.stringify({
-          presupuesto: Number(PresupuestoCreator) + props.clausula,
+          presupuesto: Number(PresupuestoCreator) + playerClause.player.clausula,
         }),
         {
           "Content-Type": "application/json",
@@ -680,8 +679,8 @@ const PlayerItem = (props) => {
               disabled={
                 props.Expires > ahora ||
                 auth.userTeam === "Equipo no asignado" ||
+                (date < initDateWinterTransfer && auth.userTeam !== "Admin") ||
                 (date >= endDateSummerTransfer &&
-                  date < initDateWinterTransfer &&
                   auth.userTeam !== "Admin") ||
                 (date >= endDateWinterTransfer &&
                   date < initDateSummerTransfer &&
@@ -694,8 +693,7 @@ const PlayerItem = (props) => {
         }
       >
         <p>
-          ¿Estás seguro de que quieres descartar al jugador? Recibirás como
-          compensación el 30% del importe de su actual cláusula.
+          ¿Estás seguro de que quieres descartar al jugador? No recibirás ningún tipo de compensación.
         </p>
       </Modal>
       <Modal
@@ -715,9 +713,9 @@ const PlayerItem = (props) => {
                 props.address === "POR" ||
                 auth.userTeam === "Equipo no asignado" ||
                 (ahora < props.Expires && auth.userTeam !== "Admin") ||
-                (date >= endDateSummerTransfer &&
-                  date < nextMonthinitDateSummerTransfer &&
-                  auth.userTeam !== "Admin")
+                (date >= endDateClausulazos &&
+                  auth.userTeam !== "Admin") ||
+                (date < initDateClausulazos && auth.userTeam !== "Admin")
               }
             >
               PAGAR CLÁUSULA
@@ -747,12 +745,12 @@ const PlayerItem = (props) => {
                 (auth.userTeam !== "Admin" && props.title === "Prueba1") ||
                 (auth.userId === props.ownerDiscard &&
                   ahora < props.discardExpiresDate) ||
-                (date >= endDateSummerTransfer &&
-                  date < initDateWinterTransfer &&
-                  auth.userTeam !== "Admin") ||
-                (date >= endDateWinterTransfer &&
-                  date < initDateSummerTransfer &&
-                  auth.userTeam !== "Admin")
+                  (date < initDateWinterTransfer && auth.userTeam !== "Admin") ||
+                  (date >= endDateSummerTransfer &&
+                    auth.userTeam !== "Admin") ||
+                  (date >= endDateWinterTransfer &&
+                    date < initDateSummerTransfer &&
+                    auth.userTeam !== "Admin")
               }
               /* disabled={auth.userId === props.ownerDiscard && ahora < props.discardExpiresDate || auth.userTeam ==="Equipo no asignado" || date < initDateSummerTransfer && auth.userTeam !== "Admin" || date >= endDateSummerTransfer && auth.userTeam !== "Admin" || date < initDateWinterTransfer && auth.userTeam !== "Admin" || date >= endDateWinterTransfer && auth.userTeam !== "Admin"} */
             >
@@ -925,7 +923,7 @@ const PlayerItem = (props) => {
         <div className="player_clause center">
           La nueva cláusula de rescisión sería de{" "}
           {quantity && /^[0-9]*$/.test(quantity) > 0
-            ? clausulaAntigua + Math.round(Number(quantity))
+            ? clausulaAntigua + Math.round(Number(quantity*2))
             : clausulaAntigua}{" "}
           monedas
         </div>
@@ -1157,9 +1155,9 @@ const PlayerItem = (props) => {
                     props.address === "POR" ||
                     auth.userTeam === "Equipo no asignado" ||
                     (ahora < props.Expires && auth.userTeam !== "Admin") ||
-                    (date >= endDateSummerTransfer &&
-                      date < nextMonthinitDateSummerTransfer &&
-                      auth.userTeam !== "Admin")
+                    (date >= endDateClausulazos&&
+                      auth.userTeam !== "Admin") ||
+                    (date < initDateClausulazos && auth.userTeam !== "Admin")
                   }
                 >
                   PAGAR CLÁUSULA
@@ -1178,12 +1176,12 @@ const PlayerItem = (props) => {
                     (auth.userTeam !== "Admin" && props.title === "Prueba1") ||
                     (auth.userId === props.ownerDiscard &&
                       ahora < props.discardExpiresDate) ||
-                    (date >= endDateSummerTransfer &&
-                      date < initDateWinterTransfer &&
-                      auth.userTeam !== "Admin") ||
-                    (date >= endDateWinterTransfer &&
-                      date < initDateSummerTransfer &&
-                      auth.userTeam !== "Admin")
+                      (date < initDateWinterTransfer && auth.userTeam !== "Admin") ||
+                      (date >= endDateSummerTransfer &&
+                        auth.userTeam !== "Admin") ||
+                      (date >= endDateWinterTransfer &&
+                        date < initDateSummerTransfer &&
+                        auth.userTeam !== "Admin")
                   }
                   /* disabled={auth.userId === props.ownerDiscard && ahora < props.discardExpiresDate || auth.userTeam ==="Equipo no asignado" || date < initDateSummerTransfer && auth.userTeam !== "Admin" || date >= endDateSummerTransfer && auth.userTeam !== "Admin" || date < initDateWinterTransfer && auth.userTeam !== "Admin" || date >= endDateWinterTransfer && auth.userTeam !== "Admin"} */
                 >
@@ -1198,12 +1196,12 @@ const PlayerItem = (props) => {
                   onClick={openOfertaHandler}
                   disabled={
                     auth.userTeam === "Equipo no asignado" ||
-                    (date >= endDateSummerTransfer &&
-                      date < initDateWinterTransfer &&
-                      auth.userTeam !== "Admin") ||
-                    (date >= endDateWinterTransfer &&
-                      date < initDateSummerTransfer &&
-                      auth.userTeam !== "Admin")
+                    (date < initDateWinterTransfer && auth.userTeam !== "Admin") ||
+                (date >= endDateSummerTransfer &&
+                  auth.userTeam !== "Admin") ||
+                (date >= endDateWinterTransfer &&
+                  date < initDateSummerTransfer &&
+                  auth.userTeam !== "Admin")
                   }
                 >
                   {loadedOfertas &&
@@ -1252,12 +1250,12 @@ const PlayerItem = (props) => {
                 disabled={
                   props.Expires > ahora ||
                   auth.userTeam === "Equipo no asignado" ||
-                  (date >= endDateSummerTransfer &&
-                    date < initDateWinterTransfer &&
-                    auth.userTeam !== "Admin") ||
-                  (date >= endDateWinterTransfer &&
-                    date < initDateSummerTransfer &&
-                    auth.userTeam !== "Admin")
+                  (date < initDateWinterTransfer && auth.userTeam !== "Admin") ||
+                (date >= endDateSummerTransfer &&
+                  auth.userTeam !== "Admin") ||
+                (date >= endDateWinterTransfer &&
+                  date < initDateSummerTransfer &&
+                  auth.userTeam !== "Admin")
                 }
               >
                 DESCARTAR JUGADOR

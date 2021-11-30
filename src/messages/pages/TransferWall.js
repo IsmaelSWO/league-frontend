@@ -5,11 +5,13 @@ import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 import { useHttpClient } from "../../shared/hooks/http-hook";
 import Presupuesto from "../../shared/components/Navigation/Presupuesto";
 import { AuthContext } from "../../shared/context/auth-context";
+import WallSearchBox from "../components/WallSearchBox"
 
 const TransferWall = () => {
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const [loadedMessages, setLoadedMessages] = useState();
   const auth = useContext(AuthContext);
+  const [searchField, setSearchField] = useState("");
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -32,6 +34,10 @@ const TransferWall = () => {
     fetchUsers();
   }, [sendRequest]);
 
+  const onSearchChange = (event) => {
+    setSearchField(event.target.value);
+  };
+
   return (
     <React.Fragment>
       <ErrorModal error={error} onClear={clearError} />
@@ -41,7 +47,13 @@ const TransferWall = () => {
           <LoadingSpinner />
         </div>
       )}
-      {!isLoading && loadedMessages && <MessageList items={loadedMessages} />}
+      {!isLoading && loadedMessages && (<React.Fragment><WallSearchBox
+            searchChange={onSearchChange}
+          /><MessageList items={loadedMessages.filter((message) => { return (
+            message.TransferMessage
+              .toLowerCase()
+              .includes(searchField.toLowerCase())
+          );})} searchField={searchField}/></React.Fragment>)}
     </React.Fragment>
   );
 };

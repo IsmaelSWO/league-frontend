@@ -16,7 +16,7 @@ const OfertaItem = (props) => {
   const year = date.getFullYear();
   const initDateSummerTransfer = new Date(year, month, 15, 22, 30);
   const endDateSummerTransfer = new Date(year, month, 18, 22, 30);
-  const initDateWinterTransfer = new Date(year, month + 1, 1, 22, 30);
+  const initDateWinterTransfer = new Date(year, month, 1, 22, 30);
   const endDateWinterTransfer = new Date(year, month, 4, 22, 30);
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -93,12 +93,19 @@ const OfertaItem = (props) => {
           Authorization: "Bearer " + auth.token,
         }
       );
+      let newClause;
+      if (props.cantidad > responsePlayer.player.clausula) {
+        newClause = responsePlayer.player.clausula;
+      }
+      if (props.cantidad <= responsePlayer.player.clausula) {
+        newClause = props.cantidad;
+      }
       await sendRequest(
         `${process.env.REACT_APP_BACKEND_URL}/players/${props.playerId}`,
         "POST",
         JSON.stringify({
           title: responsePlayer.player.title,
-          clausula: props.cantidad,
+          clausula: newClause,
           address: responsePlayer.player.address,
           posIndex: responsePlayer.player.posIndex,
           image: responsePlayer.player.image,
@@ -199,7 +206,7 @@ const OfertaItem = (props) => {
               onClick={confirmOfertaHandler}
               disabled={
                 auth.userTeam ===
-                "Equipo no asignado" /* || date < initDateSummerTransfer && auth.userTeam !== "Admin" || date >= endDateSummerTransfer && auth.userTeam !== "Admin" || date < initDateWinterTransfer && auth.userTeam !== "Admin" || date >= endDateWinterTransfer && auth.userTeam !== "Admin" */
+                "Equipo no asignado" || date < initDateSummerTransfer && auth.userTeam !== "Admin" || date >= endDateSummerTransfer && auth.userTeam !== "Admin" || date < initDateWinterTransfer && auth.userTeam !== "Admin" || date >= endDateWinterTransfer && auth.userTeam !== "Admin"
               }
             >
               SÍ
@@ -248,12 +255,12 @@ const OfertaItem = (props) => {
                 onClick={showDeleteWarningHandler}
                 disabled={
                   auth.userTeam === "Equipo no asignado" ||
-                  (date >= endDateSummerTransfer &&
-                    date < initDateWinterTransfer &&
-                    auth.userTeam !== "Admin") ||
-                  (date >= endDateWinterTransfer &&
-                    date < initDateSummerTransfer &&
-                    auth.userTeam !== "Admin")
+                  (date < initDateWinterTransfer && auth.userTeam !== "Admin") ||
+                (date >= endDateSummerTransfer &&
+                  auth.userTeam !== "Admin") ||
+                (date >= endDateWinterTransfer &&
+                  date < initDateSummerTransfer &&
+                  auth.userTeam !== "Admin")
                 }
               >
                 ACEPTAR
